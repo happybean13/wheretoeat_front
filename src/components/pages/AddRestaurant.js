@@ -3,73 +3,41 @@ import axios from "axios";
 
 const Category = (props) => {
     return(
-        <option>{props.category.category_name}</option>
+        <option>{props.id}. {props.category}</option>
     )
 }
 
 const AddRestaurant = () => {
 
     const [categoryList, setCategoryList] = useState([])
-    const [restaurant, setRestaurant] = useState({name : "", link : "", category : "", rate : 0})
+    const [restaurant, setRestaurant] = useState({name : "", link : "", category : 1, rate : 0})
 
     useEffect( async () => {
         const res = await axios.get("/add/category")
         setCategoryList(res.data.data)
     }, [])
-    useEffect(()=>{
-        console.log(restaurant.name)
-    })
-    const onChangeName = (e) => {
-        setRestaurant({
-            name: e.target.value
-        })
-    }
-    const onChangeLink = (e) => {
-        setRestaurant({
-            link : e.target.value
-        })
-    }
-    const onChangeCategory = (e) => {
-        setRestaurant({
-            category : e.target.value
-        })
-    }
-    const onChangeRate = (e) => {
-        setRestaurant({
-            rate : e.target.value
-        })
-    }
-    const onSubmit = async (e) => {
-        e.preventDefault();
-        console.log(restaurant)
-        const _restaurant = restaurant
-        const res = await axios.post("/add/submit",_restaurant)
+
+    const onChange = (e) => {
+        const newRestaurant = {...restaurant}
+        newRestaurant[e.target.name] = e.target.value
+        setRestaurant(newRestaurant)    
     }
 
-    // async onSubmit = (e) => {
-    //     e.preventDefault();
-    //     const article = {
-    //         title: this.state.title,
-    //         body: this.state.body,
-    //     };
-    //     try {
-    //         const res = await axios.post("/api/articles/add", article, {
-    //             headers: { "x-auth-token": token },
-    //         });
-    //         if (res) {
-    //             this.props.history.push("/");
-    //         } else {
-    //             alert(
-    //                 "Not a valid user! Please sign up to create an article!"
-    //             );
-    //             window.location = "/";
-    //         }
-    //     } catch (err) {
-    //         alert("Not a valid token! Please sign in to create an article");
-    //         window.location = "/";
-    //     }
-        
-    // }
+    const onChangeCategory = (e) => {
+        const newRestaurant = {...restaurant}
+        const categoryName = e.target.value
+        var array = categoryName.split(".")
+        newRestaurant.link = array[0]
+        console.log(array[0])
+        setRestaurant(newRestaurant)    
+    }
+
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const _restaurant = {...restaurant}
+        console.log(_restaurant)
+        const res = await axios.post("/add/submit",_restaurant)
+    }
     
     return (
         <div className="container">
@@ -82,7 +50,7 @@ const AddRestaurant = () => {
                         name="name"
                         type="text"
                         value={restaurant.name}
-                        onChange={onChangeName}
+                        onChange={onChange}
                     />
                 </div>
                 <div id="form-group">
@@ -91,7 +59,7 @@ const AddRestaurant = () => {
                         className="form-control"
                         name="link"
                         value={restaurant.link}
-                        onChange={onChangeLink}
+                        onChange={onChange}
                     ></textarea>
                 </div>
                 <div id="form-group">
@@ -106,7 +74,8 @@ const AddRestaurant = () => {
                         categoryList.map((r)=>{
                             return(
                                 <Category
-                                    category = {r}
+                                    id = {r.category_id}
+                                    category = {r.category_name}
                                 />
                             )
                         })
@@ -119,7 +88,7 @@ const AddRestaurant = () => {
                         className="form-control"
                         name="rate"
                         value={restaurant.rate}
-                        onChange={onChangeRate}
+                        onChange={onChange}
                     >
                         <option>1</option>
                         <option>2</option>
